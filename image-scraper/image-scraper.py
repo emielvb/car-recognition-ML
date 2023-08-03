@@ -12,19 +12,66 @@ import time
 # No longer need to add PATH to webdriver.Chrome(): webdriver.Chrome(PATH_TO_WEBDRIVER) is depracated.
 wd = webdriver.Chrome()
 
+def get_images_from_google(wd, delay, max_images):
+    # function to scroll down to bottom of google img search to allow for larger amounts of images to be downloaded at once
+    def scroll_down(wd):
+        wd.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(delay)
+
+    # url of the google image search.
+    url = "https://www.google.com/search?q=cats&tbm=isch&ved=2ahUKEwjykJ779tbzAhXhgnIEHSVQBksQ2-cCegQIABAA&oq=cats&gs_lcp=CgNpbWcQAzIHCAAQsQMQQzIHCAAQsQMQQzIECAAQQzIECAAQQzIECAAQQzIECAAQQzIECAAQQzIECAAQQzIECAAQQzIECAAQQzoHCCMQ7wMQJ1C_31NYvOJTYPbjU2gCcAB4AIABa4gBzQSSAQMzLjOYAQCgAQGqAQtnd3Mtd2l6LWltZ8ABAQ&sclient=img&ei=7vZuYfLhOeGFytMPpaCZ2AQ&bih=817&biw=1707&rlz=1C1CHBF_enCA918CA918"
+    # open the url in chrome
+    wd.get(url)
+
+    image_urls = []
+    skips = 0
+
+    while len(image_urls) + skips < max_images:
+        scroll_down(wd)
+
+        # finds all the elements on the google page that has that class name (which is the class of the image thumbnails of the google search page)
+        thumbnails = wd.find_elements(By.CLASS_NAME, "Q4LuWd")
+
+        # loop through all the thumbnails and try to click on them
+        # len(image_urls) + skips part ensures that we don't loop through images we've already gotten.
+        for img in thumbnails[len(image_urls) + skips: max_images]:
+            try:
+                img.click()
+                time.sleep(delay)
+            except:
+                continue
+            
+            # this class name should correspond to the top image once a thumbnail has been clicked.
+            images = wd.find_elements(By.CLASS_NAME, "n3VNCb")
+            # this should ideally only give us one image, but it could loop through mutliple and hence,
+            # we will go through each of them and do some checks in order to verify that they have a proper image source.
+            for image in images:
+                # 'if it does have the source (src) attribute, and 
+                if image.get_attribute('src') in image_urls:
+                    max_images += 1
+                    skips += 1
+                    break
+
+                if image.get_attribute('src') and 'http' in image.get_attribute('src'):
+                    image_urls.add(image.get_attribute('src'))
+                    print(f"Found {len(image_urls)}")
+
+    return image_urls
+
 def download_image(download_path, url, file_name):
-	try:
-		image_content = requests.get(url).content
-		image_file = io.BytesIO(image_content)
-		image = Image.open(image_file)
-		file_path = download_path + file_name
+    try:
+        image_content = requests.get(url).content
+        image_file = io.BytesIO(image_content)
+        image = Image.open(image_file)
+        file_path = download_path + file_name
 
-		with open(file_path, "wb") as f:
-			image.save(f, "JPEG")
+        with open(file_path, "wb") as f:
+            image.save(f, "JPEG")
 
-		print("Success")
-	except Exception as e:
-		print('FAILED -', e)
-	
-test_img_url = r'https://www.motortrend.com/uploads/2023/08/2024-porsche-911-st-60th-anniversary-18.jpg?fit=around%7C875:492'
-download_image('./image-scraper/images/', test_img_url, file_name='Porsche.jpg')
+        print("Success")
+    except Exception as e:
+        print('FAILED -', e)
+    
+# test_img_url = r'https://www.motortrend.com/uploads/2023/08/2024-porsche-911-st-60th-anniversary-18.jpg?fit=around%7C875:492'
+# download_image('./image-scraper/images/', test_img_url, file_name='Porsche.jpg')
+get_images_from_google(wd, delay=0.1, max_images=2)
