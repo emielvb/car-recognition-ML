@@ -27,4 +27,4 @@ def download_image(download_path, url, file_name):
 		print('FAILED -', e)
 	
 test_img_url = r'https://www.motortrend.com/uploads/2023/08/2024-porsche-911-st-60th-anniversary-18.jpg?fit=around%7C875:492'
-download_image('./', test_img_url, file_name='Porsche.jpg')
+download_image('./image-scraper/images/', test_img_url, file_name='Porsche.jpg')
