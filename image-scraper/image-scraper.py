@@ -85,12 +85,12 @@ def download_image(download_path, url, file_name):
         print('FAILED -', e)
 
 def test_img_scraper():
-    urls = get_images_from_google(wd, 3)
+    urls = get_images_from_google(wd, 80, 0.3)
+    # close chrome
+    wd.quit()
 
     for i, url in enumerate(urls):
-        download_image("./images-test/", url, str(i) + ".jpg")
-
-    wd.quit()
+        download_image("./image-scraper/images-test/", url, str(i) + ".jpg")
 
 # test_img_url = r'https://www.motortrend.com/uploads/2023/08/2024-porsche-911-st-60th-anniversary-18.jpg?fit=around%7C875:492'
 # download_image('./image-scraper/images/', test_img_url, file_name='Porsche.jpg')
