@@ -46,7 +46,13 @@ def get_images_from_google(wd, max_images=10, delay=1):
                 continue
             
             # this class name should correspond to the top image once a thumbnail has been clicked.
-            images = wd.find_elements(By.CLASS_NAME, "n3VNCb")
+            # compound class names (ones with spaces in them) are not supported using this method.
+            # Thus, we only use the first part of the class, and ignore subclasses. (Hopefully this works)
+            images = wd.find_elements(By.CLASS_NAME, "r48jcc")
+            
+            # check that indeed an image has been found
+            if len(images) == 0:
+                print('Wrong class code. Find the correct new classname and change code accordingly.')
             # this should ideally only give us one image, but it could loop through mutliple and hence,
             # we will go through each of them and do some checks in order to verify that they have a proper image source.
             for image in images:
@@ -79,7 +85,7 @@ def download_image(download_path, url, file_name):
         print('FAILED -', e)
 
 def test_img_scraper():
-    urls = get_images_from_google(wd, 6)
+    urls = get_images_from_google(wd, 3)
 
     for i, url in enumerate(urls):
         download_image("./images-test/", url, str(i) + ".jpg")
