@@ -8,18 +8,27 @@ import io
 from PIL import Image
 import time
 
-# don't need to specify path to chrome webdriver with latest Selenium versions.
-web_driver = webdriver.Chrome()
+def get_search_url_from_query(search_query):
+    # get separate words in lower case by splitting on each space
+    separate_words = search_query.lower().split(' ')
+    # add them all together with a + between each word.
+    query_reformed = '+'.join(separate_words)
+    # return search url in correct format.
+    return 'https://www.google.com/search?tbm=isch&q={}'.format(query_reformed)
 
-def get_image_urls(web_driver, max_images=10, delay=1):
-    # function to scroll down to bottom of google img search to allow for larger amounts of images to be downloaded at once
-    def scroll_down(web_driver, ntimes=1):
-        for i in range(ntimes):
-            web_driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-            time.sleep(delay)
+# function to scroll down to bottom of google img search to allow for larger amounts of images to be downloaded at once
+def scroll_down(web_driver, delay=0.25, ntimes=1):
+    for i in range(ntimes):
+        web_driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(delay)
+
+
+def get_image_urls(search_query, max_images=10, delay=0.25):
+    # don't need to specify path to chrome webdriver with latest Selenium versions.
+    web_driver = webdriver.Chrome()
 
     # url of the google image search.
-    url = "https://www.google.com/search?q=cats&tbm=isch&ved=2ahUKEwjykJ779tbzAhXhgnIEHSVQBksQ2-cCegQIABAA&oq=cats&gs_lcp=CgNpbWcQAzIHCAAQsQMQQzIHCAAQsQMQQzIECAAQQzIECAAQQzIECAAQQzIECAAQQzIECAAQQzIECAAQQzIECAAQQzIECAAQQzoHCCMQ7wMQJ1C_31NYvOJTYPbjU2gCcAB4AIABa4gBzQSSAQMzLjOYAQCgAQGqAQtnd3Mtd2l6LWltZ8ABAQ&sclient=img&ei=7vZuYfLhOeGFytMPpaCZ2AQ&bih=817&biw=1707&rlz=1C1CHBF_enCA918CA918"
+    url = get_search_url_from_query(search_query)
     # open the url in chrome
     web_driver.get(url)
 
@@ -27,7 +36,7 @@ def get_image_urls(web_driver, max_images=10, delay=1):
     skips = 0
 
     # scroll down before going over images
-    scroll_down(web_driver, ntimes=int(max_images/10))
+    scroll_down(web_driver, delay=delay, ntimes=int(max_images/10))
 
     # gather image urls
     while len(image_urls) + skips < max_images:
@@ -66,10 +75,13 @@ def get_image_urls(web_driver, max_images=10, delay=1):
                 if image.get_attribute('src') and 'http' in image.get_attribute('src'):
                     image_urls.append(image.get_attribute('src'))
                     print(f"Found {len(image_urls)} images")
+    # close chrome
+    web_driver.quit()
 
     return image_urls
 
 def test_getting_urls():
-    urls = get_image_urls(web_driver, 10, 0.3)
-    # close chrome
-    web_driver.quit()
+    urls = get_image_urls('porsche', 10, 0.25)
+
+# print(get_search_url_from_query('porsche gt3 rs'))
+# test_getting_urls()
