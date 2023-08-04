@@ -8,11 +8,10 @@ import io
 from PIL import Image
 import time
 
-# PATH = "C:\\Program Files (x86)\\chromedriver-win64\\chromedriver.exe"
-# No longer need to add PATH to webdriver.Chrome(): webdriver.Chrome(PATH_TO_WEBDRIVER) is depracated.
+# don't need to specify path to chrome webdriver with latest Selenium versions.
 web_driver = webdriver.Chrome()
 
-def get_images_from_google(web_driver, max_images=10, delay=1):
+def get_image_urls(web_driver, max_images=10, delay=1):
     # function to scroll down to bottom of google img search to allow for larger amounts of images to be downloaded at once
     def scroll_down(web_driver, ntimes=1):
         for i in range(ntimes):
@@ -70,30 +69,7 @@ def get_images_from_google(web_driver, max_images=10, delay=1):
 
     return image_urls
 
-def download_image(download_path, url, file_name):
-    try:
-        image_content = requests.get(url).content
-        image_file = io.BytesIO(image_content)
-        image = Image.open(image_file)
-        file_path = download_path + file_name
-
-        with open(file_path, "wb") as f:
-            image.save(f, "JPEG")
-
-        print("Success")
-    except Exception as e:
-        print('FAILED -', e)
-
-def test_img_scraper():
-    urls = get_images_from_google(web_driver, 10, 0.3)
+def test_getting_urls():
+    urls = get_image_urls(web_driver, 10, 0.3)
     # close chrome
     web_driver.quit()
-
-    for i, url in enumerate(urls):
-        download_image("./image-scraper/images-test/", url, str(i) + ".jpg")
-
-# test_img_url = r'https://www.motortrend.com/uploads/2023/08/2024-porsche-911-st-60th-anniversary-18.jpg?fit=around%7C875:492'
-# download_image('./image-scraper/images/', test_img_url, file_name='Porsche.jpg')
-# get_images_from_google(web_driver, delay=0.1, max_images=2)
-
-test_img_scraper()
