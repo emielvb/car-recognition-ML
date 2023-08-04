@@ -85,7 +85,7 @@ def download_image(download_path, url, file_name):
         print('FAILED -', e)
 
 def test_img_scraper():
-    urls = get_images_from_google(wd, 80, 0.3)
+    urls = get_images_from_google(wd, 10, 0.3)
     # close chrome
     wd.quit()
 
