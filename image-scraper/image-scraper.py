@@ -10,30 +10,30 @@ import time
 
 # PATH = "C:\\Program Files (x86)\\chromedriver-win64\\chromedriver.exe"
 # No longer need to add PATH to webdriver.Chrome(): webdriver.Chrome(PATH_TO_WEBDRIVER) is depracated.
-wd = webdriver.Chrome()
+web_driver = webdriver.Chrome()
 
-def get_images_from_google(wd, max_images=10, delay=1):
+def get_images_from_google(web_driver, max_images=10, delay=1):
     # function to scroll down to bottom of google img search to allow for larger amounts of images to be downloaded at once
-    def scroll_down(wd, ntimes=1):
+    def scroll_down(web_driver, ntimes=1):
         for i in range(ntimes):
-            wd.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            web_driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             time.sleep(delay)
 
     # url of the google image search.
     url = "https://www.google.com/search?q=cats&tbm=isch&ved=2ahUKEwjykJ779tbzAhXhgnIEHSVQBksQ2-cCegQIABAA&oq=cats&gs_lcp=CgNpbWcQAzIHCAAQsQMQQzIHCAAQsQMQQzIECAAQQzIECAAQQzIECAAQQzIECAAQQzIECAAQQzIECAAQQzIECAAQQzIECAAQQzoHCCMQ7wMQJ1C_31NYvOJTYPbjU2gCcAB4AIABa4gBzQSSAQMzLjOYAQCgAQGqAQtnd3Mtd2l6LWltZ8ABAQ&sclient=img&ei=7vZuYfLhOeGFytMPpaCZ2AQ&bih=817&biw=1707&rlz=1C1CHBF_enCA918CA918"
     # open the url in chrome
-    wd.get(url)
+    web_driver.get(url)
 
     image_urls = []
     skips = 0
 
     # scroll down before going over images
-    scroll_down(wd, ntimes=int(max_images/10))
+    scroll_down(web_driver, ntimes=int(max_images/10))
 
     # gather image urls
     while len(image_urls) + skips < max_images:
         # finds all the elements on the google page that has that class name (which is the class of the image thumbnails of the google search page)
-        thumbnails = wd.find_elements(By.CLASS_NAME, "Q4LuWd")
+        thumbnails = web_driver.find_elements(By.CLASS_NAME, "Q4LuWd")
 
         # loop through all the thumbnails and try to click on them
         # len(image_urls) + skips part ensures that we don't loop through images we've already gotten.
@@ -48,7 +48,7 @@ def get_images_from_google(wd, max_images=10, delay=1):
             # this class name should correspond to the top image once a thumbnail has been clicked.
             # compound class names (ones with spaces in them) are not supported using this method.
             # Thus, we only use the first part of the class, and ignore subclasses. (Hopefully this works)
-            images = wd.find_elements(By.CLASS_NAME, "r48jcc")
+            images = web_driver.find_elements(By.CLASS_NAME, "r48jcc")
             
             # check that indeed an image has been found
             if len(images) == 0:
@@ -85,15 +85,15 @@ def download_image(download_path, url, file_name):
         print('FAILED -', e)
 
 def test_img_scraper():
-    urls = get_images_from_google(wd, 10, 0.3)
+    urls = get_images_from_google(web_driver, 10, 0.3)
     # close chrome
-    wd.quit()
+    web_driver.quit()
 
     for i, url in enumerate(urls):
         download_image("./image-scraper/images-test/", url, str(i) + ".jpg")
 
 # test_img_url = r'https://www.motortrend.com/uploads/2023/08/2024-porsche-911-st-60th-anniversary-18.jpg?fit=around%7C875:492'
 # download_image('./image-scraper/images/', test_img_url, file_name='Porsche.jpg')
-# get_images_from_google(wd, delay=0.1, max_images=2)
+# get_images_from_google(web_driver, delay=0.1, max_images=2)
 
 test_img_scraper()
