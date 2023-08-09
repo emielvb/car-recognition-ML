@@ -6,7 +6,7 @@ import os
 
 def get_segmented_image(imgpath):
     # Load the segmentation model
-    segmentation_model = YOLO('YOLO_models\yolov8n-seg.pt')
+    segmentation_model = YOLO(os.path.join('..', 'src', 'YOLO_models', 'yolov8n-seg.pt'))
     
     # perform the segmentation on the image
     results = segmentation_model.predict(imgpath, retina_masks=True)
@@ -43,7 +43,7 @@ def save_segmented_image(imgpath_orig, segm_folder):
 
     # save segmented image
     # first check if we even have a segmented image.
-    if segmented_img:
+    if isinstance(segmented_img, list):
         cv2.imwrite(imgpath_segm, segmented_img)
     else:
         print("No segmented image was found and thus no image was saved.")
