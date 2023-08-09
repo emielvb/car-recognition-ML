@@ -9,14 +9,14 @@ segmentation_model = YOLO(os.path.join('..', 'src', 'YOLO_models', 'yolov8n-seg.
     
 def get_segmented_image(imgpath):
     # perform the segmentation on the image
-    results = segmentation_model.predict(imgpath, retina_masks=True)
+    results = segmentation_model.predict(imgpath, retina_masks=True, verbose=False)
 
     # get only the segmentation-highlighted objects from the image using the obtained masks
     # from https://github.com/ultralytics/ultralytics/issues/1411
     segmented_img = None
     for result in results:
         mask = result.masks.cpu().numpy()
-        masks = mask.masks.astype(bool)
+        masks = mask.data.astype(bool)
         ori_img = result.orig_img
         for m in masks:
             # initialise new segmented image as numpy array
