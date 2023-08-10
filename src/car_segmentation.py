@@ -29,7 +29,7 @@ def get_segmented_image(imgpath):
 
 
 # function that performs the segmentation of the car
-def save_segmented_image(imgpath_orig, segm_folder):
+def save_segmented_image(imgpath_orig, segm_folder, rescale=False):
     # get img filename and folder from imgpath
     orig_folder, imgfilename = os.path.split(imgpath_orig)
     # get image name and extension from the filename
@@ -44,6 +44,8 @@ def save_segmented_image(imgpath_orig, segm_folder):
     # save segmented image
     # first check if we even have a segmented image.
     if not isinstance(segmented_img, type(None)):
+        if rescale:
+            segmented_img = cv2.resize(segmented_img, (256, 256))
         cv2.imwrite(imgpath_segm, segmented_img)
     else:
         print('Image could not be segmented.')
