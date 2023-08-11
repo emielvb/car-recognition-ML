@@ -22,10 +22,22 @@ def scroll_down(web_driver, delay=0.25, ntimes=1):
         web_driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         time.sleep(delay)
 
+def click_reject_cookies(web_driver):
+    # Locate the reject-cookies button with contains()
+    reject_cookies_button = web_driver.find_element(By.NAME, "V67aGc")
+
+    # Now click on it to reject all cookies
+    reject_cookies_button.click()
+
 
 def get_image_urls(search_query, max_images=10, delay=0.25):
     # don't need to specify path to chrome webdriver with latest Selenium versions.
     web_driver = webdriver.Chrome()
+
+    # (try to) open chrome to google front page, this will first give a cookie notification
+    web_driver.get("https://www.google.com")
+    # reject cookies
+    # click_reject_cookies(web_driver)
 
     # url of the google image search.
     url = get_search_url_from_query(search_query)
@@ -84,4 +96,4 @@ def test_getting_urls():
     urls = get_image_urls('porsche', 10, 0.25)
 
 # print(get_search_url_from_query('porsche gt3 rs'))
-# test_getting_urls()
+test_getting_urls()
